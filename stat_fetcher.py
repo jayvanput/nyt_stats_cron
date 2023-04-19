@@ -7,8 +7,8 @@ class StatFetcher:
 
     PUZZLE_INFO = "https://nyt-games-prd.appspot.com/svc/crosswords/v2/puzzle/daily-{date}.json"
     SOLVE_INFO = "https://nyt-games-prd.appspot.com/svc/crosswords/v2/game/{puzzle_id}.json"
-
-    def __init__(self, cookie):
+    
+    def __init__(self, cookie: str|None):
         self.cookie: dict[str, str|None] = {'NYT-S': cookie}
 
     def get_puzzle_id(self, puzzle_date: datetime.date) -> str:
@@ -21,7 +21,7 @@ class StatFetcher:
 
         return puzzle_id
 
-    def fetch_stats(self, puzzle_date: datetime.date) -> dict[str, str]:
+    def fetch_stats(self, puzzle_date: datetime.date) -> dict[str,bool|str|int]:
         """ Returns the user's stats for the specified date. """
         puzzle_id = self.get_puzzle_id(puzzle_date)
         response = requests.get(
@@ -30,11 +30,26 @@ class StatFetcher:
         )
         return response.json()["results"]
 
+def format_stats(stats: dict[str, bool|str|int], puzzle_date: datetime.date) -> tuple[int|str]:
+    if stats["solved"] == False:
+        return None
+    puzzle_date_str = puzzle_date.strftime("%Y-%m-%d")
+    solve_date = datetime.datetime.fromtimestamp(stats["firstCleared"]).strftime("%Y-%m-%d")
+    elapsed_seconds = stats["timeElapsed"]
+    streak = 1 if stats["eligible"] else 0
+    owner_id = 1
+    day = puzzle_date.weekday()
+    used_help = 'firstChecked' in stats or 'firstRevealed' in stats
+
+    output = (puzzle_date_str, solve_date, elapsed_seconds, streak, owner_id, day, used_help)
+    return output
+
+    
 
 if __name__ == "__main__":
     dotenv.load_dotenv()
     COOKIE = os.environ.get("COOKIE")
     fetcher = StatFetcher(COOKIE)
-    stats = fetcher.fetch_stats(datetime.date(2023, 4, 19))
+    stats = fetcher.fetch_stats(datetime.date(2023, 4, 17))
 
-    print(stats)
+    print(format_stats(stats, datetime.date(2023, 4, 17)))

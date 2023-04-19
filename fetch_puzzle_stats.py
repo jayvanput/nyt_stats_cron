@@ -1,6 +1,7 @@
 import dotenv
 import os
 import datetime
+import sqlite3
 
 from stat_fetcher import StatFetcher
 
@@ -17,3 +18,8 @@ if __name__ == "__main__":
     output = fetcher.fetch_stats(todays_date)
 
     print(output)
+    con = sqlite3.connect("D:\\Projects\\nyt_dashboard_api\\db.sqlite3")
+    cur = con.cursor()
+    res = cur.execute("SELECT * FROM api_entry;")
+
+    print(res.fetchone())
