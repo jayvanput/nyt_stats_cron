@@ -19,9 +19,9 @@ if __name__ == "__main__":
 
     values = format_stats(output, todays_date)
 
-    print(values)
     con = sqlite3.connect("D:\\Projects\\nyt_dashboard_api\\db.sqlite3")
     cur = con.cursor()
-    res = cur.execute(f"INSERT INTO api_entry (puzzle_date, solve_date, elapsed_seconds, streak, owner_id, day, used_help) VALUES {values};")
-    con.commit()
+    if values:
+        res = cur.execute(f"INSERT INTO api_entry (puzzle_date, solve_date, elapsed_seconds, streak, owner_id, day, used_help) VALUES {values};")
+        con.commit()
     con.close()
