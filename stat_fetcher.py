@@ -30,16 +30,16 @@ class StatFetcher:
         )
         return response.json()["results"]
 
-def format_stats(stats: dict[str, bool|str|int], puzzle_date: datetime.date) -> tuple[int|str]:
+def format_stats(stats: dict[str, bool|str|int], puzzle_date: datetime.date) -> tuple[int|str, ...]:
     if stats["solved"] == False:
         return None
-    puzzle_date_str = puzzle_date.strftime("%Y-%m-%d")
-    solve_date = datetime.datetime.fromtimestamp(stats["firstCleared"]).strftime("%Y-%m-%d")
-    elapsed_seconds = stats["timeElapsed"]
-    streak = 1 if stats["eligible"] else 0
-    owner_id = 1
-    day = puzzle_date.weekday()
-    used_help = 'firstChecked' in stats or 'firstRevealed' in stats
+    puzzle_date_str: str = puzzle_date.strftime("%Y-%m-%d")
+    solve_date: str  = datetime.datetime.fromtimestamp(stats["firstCleared"]).strftime("%Y-%m-%d")
+    elapsed_seconds: str = stats["timeElapsed"]
+    streak: int = 1 if stats["eligible"] else 0
+    owner_id: int = 1
+    day: str = puzzle_date.strftime("%A")
+    used_help = 1 if 'firstChecked' in stats or 'firstRevealed' in stats else 0
 
     output = (puzzle_date_str, solve_date, elapsed_seconds, streak, owner_id, day, used_help)
     return output
